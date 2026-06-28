@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - FAST BAZAAR</title>
+    <link rel="stylesheet" href="./index.css">
+    <link rel="icon" type="image/png" href="logo.png" />
+</head>
+<body>
+
+<header>
+    <div class="logo-wrapper">
+        <img src="logo.png" alt="Fast Bazaar Logo" class="logo" />
+        <span class="tagline">Deal Bana</span>
+    </div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="products.html">Products</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+    </nav>
+</header>
+
+<section class="featured">
+    <h2>Our Products</h2>
+    <button class="add-product-btn" onclick="openModal()">+ Add Product</button>
+
+    <div class="product-container" id="productContainer">
+        <!-- Products will be loaded here from localStorage -->
+    </div>
+</section>
+
+<!-- Modal for adding product -->
+<div id="productModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2>Add New Product</h2>
+        <form id="productForm" onsubmit="addProduct(event)">
+            <div class="form-group">
+                <label for="productName">Product Name</label>
+                <input type="text" id="productName" required />
+            </div>
+            <div class="form-group">
+                <label for="productPrice">Price (Rs)</label>
+                <input type="number" id="productPrice" required min="0" />
+            </div>
+            <div class="form-group">
+                <label for="productImage">Product Image</label>
+                <input type="file" id="productImage" accept="image/*" required />
+            </div>
+            <!-- <div class="form-group">
+                <img id="imagePreview" class="image-preview" />
+            </div> -->
+            <button type="submit" class="submit-btn">Add Product</button>
+        </form>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2025 FAST BAZAAR. All rights reserved.</p>
+</footer>
+
+<script>
+    // Load products from localStorage on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadProducts();
+    });
+
+    // Image preview
+    document.getElementById('productImage').addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                var preview = document.getElementById('imagePreview');
+                preview.src = event.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function openModal() {
+        document.getElementById('productModal').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('productModal').style.display = 'none';
+        document.getElementById('productForm').reset();
+        document.getElementById('imagePreview').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        var modal = document.getElementById('productModal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    };
+
+    function addProduct(event) {
+        event.preventDefault();
+
+        var name = document.getElementById('productName').value;
+        var price = document.getElementById('productPrice').value;
+        var imageFile = document.getElementById('productImage').files[0];
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var imageData = e.target.result;
+
+            // Get existing products from localStorage
+            var products = JSON.parse(localStorage.getItem('fastBazaarProducts')) || [];
+
+            // Add new product
+            var newProduct = {
+                id: Date.now(),
+                name: name,
+                price: price,
+                image: imageData
+            };
+
+            products.push(newProduct);
+
+            // Save to localStorage
+            localStorage.setItem('fastBazaarProducts', JSON.stringify(products));
+
+            // Reload products
+            loadProducts();
+
+            // Close modal
+            closeModal();
+        };
+
+        reader.readAsDataURL(imageFile);
+    }
+
+    function loadProducts() {
+        var container = document.getElementById('productContainer');
+        var products = JSON.parse(localStorage.getItem('fastBazaarProducts')) || [];
+
+        if (products.length === 0) {
+            container.innerHTML = '<p class="no-products">No products added yet. Click "Add Product" to add your first product!</p>';
+            return;
+        }
+
+        var html = '';
+        for (var i = 0; i < products.length; i++) {
+            var product = products[i];
+            html += '<div class="product-card">';
+            html += '<button class="delete-btn" onclick="deleteProduct(' + product.id + ')">&times;</button>';
+            html += '<img src="' + product.image + '" alt="' + product.name + '" />';
+            html += '<h3>' + product.name + '</h3>';
+            html += '<p>Rs ' + product.price + '</p>';
+            html += '<button>Add to Cart</button>';
+            html += '</div>';
+        }
+
+        container.innerHTML = html;
+    }
+
+    function deleteProduct(id) {
+        if (confirm('Are you sure you want to delete this product?')) {
+            var products = JSON.parse(localStorage.getItem('fastBazaarProducts')) || [];
+            products = products.filter(function(product) {
+                return product.id !== id;
+            });
+            localStorage.setItem('fastBazaarProducts', JSON.stringify(products));
+            loadProducts();
+        }
+    }
+</script>
+
+</body>
+</html>
