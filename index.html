@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - FAST BAZAAR</title>
+    <link rel="stylesheet" href="./index.css">
+    <link rel="icon" type="image/png" href="logo.png" />
+</head>
+
+  <body>
+    <!-- Navigation / Header -->
+    <header>
+      <div class="logo-wrapper">
+        <img src="logo.png" alt="Fast Bazaar Logo" class="logo" />
+        <span class="tagline">Deal Bana</span>
+      </div>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="products.html">Products</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="hero">
+      <div class="hero-content">
+        <h2>Welcome to FAST BAZAAR</h2>
+        <p>Your Campus Marketplace for Amazing Deals</p>
+        <a href="products.html" class="hero-btn">Browse Products</a>
+      </div>
+    </div>
+
+    <!-- Featured Products -->
+    <div class="featured">
+      <h2>Featured Products</h2>
+
+      <div class="product-container" id="featuredProducts">
+        <!-- Products will be loaded from localStorage -->
+      </div>
+    </div>
+
+<footer>
+    <p>&copy; 2025 FAST BAZAAR. All rights reserved.</p>
+</footer>
+
+<script>
+    // Load featured products from localStorage on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadFeaturedProducts();
+    });
+
+    function loadFeaturedProducts() {
+        var container = document.getElementById('featuredProducts');
+        var products = JSON.parse(localStorage.getItem('fastBazaarProducts')) || [];
+
+        if (products.length === 0) {
+            container.innerHTML = '<p class="no-products">No products available. <a href="products.html" style="color: #6a0dad;">Add products</a> to see them here!</p>';
+            return;
+        }
+
+        // Show up to 6 featured products
+        var featuredCount = Math.min(products.length, 6);
+        var html = '';
+
+        for (var i = 0; i < featuredCount; i++) {
+            var product = products[i];
+            html += '<div class="product-card">';
+            html += '<img src="' + product.image + '" alt="' + product.name + '" />';
+            html += '<h3>' + product.name + '</h3>';
+            html += '<p>Rs ' + product.price + '</p>';
+            html += '<button>Add to Cart</button>';
+            html += '</div>';
+        }
+
+        container.innerHTML = html;
+    }
+</script>
+
+</body>
+</html>
